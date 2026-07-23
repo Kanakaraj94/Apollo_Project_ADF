@@ -97,6 +97,8 @@
 					{
 						"name": "Provider_DF",
 						"type": "ExecuteDataFlow",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -123,6 +125,96 @@
 							},
 							"traceLevel": "Fine"
 						}
+					},
+					{
+						"name": "PCP_DF",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "PCP_DF",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"PcpData": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "Pregnancy_DF",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Pregnancy_DF",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"PregnancyDiagnosisData": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "Location_DF",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Location_DF",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"LocationData": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
 					}
 				],
 				"policy": {
@@ -133,7 +225,10 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/Encounter_DF')]",
 				"[concat(variables('factoryId'), '/dataflows/Encounter_Dx_DF')]",
-				"[concat(variables('factoryId'), '/dataflows/Provider_DF')]"
+				"[concat(variables('factoryId'), '/dataflows/Provider_DF')]",
+				"[concat(variables('factoryId'), '/dataflows/PCP_DF')]",
+				"[concat(variables('factoryId'), '/dataflows/Pregnancy_DF')]",
+				"[concat(variables('factoryId'), '/dataflows/Location_DF')]"
 			]
 		},
 		{
@@ -797,7 +892,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PCP_PL')]",
+			"name": "[concat(parameters('factoryName'), '/PCP_DF')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
