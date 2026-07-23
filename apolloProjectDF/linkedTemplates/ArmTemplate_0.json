@@ -7,9 +7,25 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "apolloProjectDF"
 		},
+		"Adf2AzSql_ls_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Adf2AzSql_ls'"
+		},
 		"AzureKeyVault_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://ApolloKeyVaultStore.vault.azure.net/"
+		},
+		"Adf2AzSql_ls_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "apolloproject.database.windows.net"
+		},
+		"Adf2AzSql_ls_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "apollo_db"
+		},
+		"Adf2AzSql_ls_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "apollo_admin"
 		},
 		"Adls2Adf_ls_properties_typeProperties_url": {
 			"type": "string",
@@ -56,6 +72,28 @@
 			"properties": {
 				"type": "SelfHosted",
 				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Adf2AzSql_ls')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Adf2AzSql_ls_properties_typeProperties_server')]",
+					"database": "[parameters('Adf2AzSql_ls_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Adf2AzSql_ls_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Adf2AzSql_ls_password')]"
+					}
+				}
 			},
 			"dependsOn": []
 		},
@@ -136,6 +174,27 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/SelfHostedIR')]",
 				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Apollo_G_AzsqlDB')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Adf2AzSql_ls",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "",
+					"table": "Apollo_Tb"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Adf2AzSql_ls')]"
 			]
 		},
 		{
@@ -226,6 +285,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
+						"fileName": "Encounter_Table_S-00001.csv",
 						"folderPath": "Medallion/Silver",
 						"fileSystem": "apollo-datasets"
 					},
@@ -296,6 +356,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
+						"fileName": "Encounter_Dx_Table_S.csv",
 						"folderPath": "Medallion/Silver",
 						"fileSystem": "apollo-datasets"
 					},
@@ -398,6 +459,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
+						"fileName": "Provider_Table_S.csv",
 						"folderPath": "Medallion/Silver",
 						"fileSystem": "apollo-datasets"
 					},
@@ -517,6 +579,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
+						"fileName": "PCP_Table_S.csv",
 						"folderPath": "Medallion/Silver",
 						"fileSystem": "apollo-datasets"
 					},
@@ -592,6 +655,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
+						"fileName": "PregnancyDiagnosis_Table_S.csv",
 						"folderPath": "Medallion/Silver",
 						"fileSystem": "apollo-datasets"
 					},
@@ -659,67 +723,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/Adls2Adf_ls')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Location_S')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Adls2Adf_ls",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"folderPath": "Medallion/Silver",
-						"fileSystem": "apollo-datasets"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "dx_enc_id",
-						"type": "String"
-					},
-					{
-						"name": "dx_line",
-						"type": "String"
-					},
-					{
-						"name": "dx_icd",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Adls2Adf_ls')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Patient_Raw')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "MySql2Adf_ls",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "MySqlTable",
-				"schema": [],
-				"typeProperties": {
-					"tableName": "`patient_table`"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/MySql2Adf_ls')]"
 			]
 		}
 	]
