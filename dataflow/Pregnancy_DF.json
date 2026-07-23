@@ -1,0 +1,65 @@
+{
+	"name": "Pregnancy_DF",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "PregnancyDiagnosis_B",
+						"type": "DatasetReference"
+					},
+					"name": "PregnancyDiagnosisData"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "PregnancyDiagnosis_S",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AddUniqueKey"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          code as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> PregnancyDiagnosisData",
+				"PregnancyDiagnosisData keyGenerate(output(icd_id as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> AddUniqueKey",
+				"AddUniqueKey select(mapColumn(",
+				"          icd_id,",
+				"          code",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          dx_enc_id as string,",
+				"          dx_line as string,",
+				"          dx_icd as string",
+				"     ),",
+				"     filePattern:'PregnancyDiagnosis_Table_S.csv',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

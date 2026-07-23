@@ -1,0 +1,29 @@
+{
+	"name": "PregnancyDiagnosis_B",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Adls2Adf_ls",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Pregnancy_Diagnosis.csv",
+				"folderPath": "Medallion/Bronze",
+				"fileSystem": "apollo-datasets"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "code",
+				"type": "String"
+			}
+		]
+	}
+}
