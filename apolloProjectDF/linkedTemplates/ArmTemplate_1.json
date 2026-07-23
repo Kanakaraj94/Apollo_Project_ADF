@@ -13,6 +13,63 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/Encounter_Dx_DF')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "Encounter_Dx_B",
+								"type": "DatasetReference"
+							},
+							"name": "EncounterDxData"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Encounter_Dx_S",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [],
+					"scriptLines": [
+						"source(output(",
+						"          dx_enc_id as string,",
+						"          dx_line as string,",
+						"          dx_icd as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> EncounterDxData",
+						"EncounterDxData sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          enc_id as string,",
+						"          enc_patient_id as string,",
+						"          visit_prov_id as string,",
+						"          enc_status as string,",
+						"          enc_date as string,",
+						"          due_date as string",
+						"     ),",
+						"     filePattern:'Encounter_Dx_Table_S.csv',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Provider_DF')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -478,10 +535,68 @@
 				"annotations": []
 			},
 			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/Encounter_Dx_DF')]",
 				"[concat(variables('factoryId'), '/dataflows/Provider_DF')]",
 				"[concat(variables('factoryId'), '/dataflows/PCP_DF')]",
 				"[concat(variables('factoryId'), '/dataflows/Pregnancy_DF')]",
 				"[concat(variables('factoryId'), '/dataflows/Location_DF')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Apollo_PL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "R2B",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Raw2Bronze_PL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "B2S",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "R2B",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Bronze2Silver_PL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Bronze2Silver_PL')]"
 			]
 		}
 	]
