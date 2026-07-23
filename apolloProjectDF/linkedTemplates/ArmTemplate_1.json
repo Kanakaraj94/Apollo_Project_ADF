@@ -13,46 +13,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/Location_S')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Adls2Adf_ls",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "Location_Table_S.csv",
-						"folderPath": "Medallion/Silver",
-						"fileSystem": "apollo-datasets"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "dx_enc_id",
-						"type": "String"
-					},
-					{
-						"name": "dx_line",
-						"type": "String"
-					},
-					{
-						"name": "dx_icd",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/Patient_Raw')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -71,45 +31,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Patient_R')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Blob2Adf_ls",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"container": "apollo-data"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "dx_enc_id",
-						"type": "String"
-					},
-					{
-						"name": "dx_line",
-						"type": "String"
-					},
-					{
-						"name": "dx_icd",
-						"type": "String"
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Patient_Data_S')]",
+			"name": "[concat(parameters('factoryName'), '/PregnancyDiagnosis_B')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -122,7 +44,39 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "Patient_Data_S.csv",
+						"fileName": "Pregnancy_Diagnosis.csv",
+						"folderPath": "Medallion/Bronze",
+						"fileSystem": "apollo-datasets"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "code",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PregnancyDiagnosis_S')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Adls2Adf_ls",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "PregnancyDiagnosis_Table_S.csv",
 						"folderPath": "Medallion/Silver",
 						"fileSystem": "apollo-datasets"
 					},
@@ -149,54 +103,54 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Patient_Blob2Bronze')]",
+			"name": "[concat(parameters('factoryName'), '/Provider_B')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "Blob2Adf_ls",
+					"referenceName": "Adls2Adf_ls",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
-				"type": "DelimitedText",
+				"type": "Json",
 				"typeProperties": {
 					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "`patient_table`.csv",
-						"container": "apollo-data"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "unique_patient_id",
-						"type": "String"
-					},
-					{
-						"name": "gender",
-						"type": "String"
-					},
-					{
-						"name": "birth_date",
-						"type": "String"
-					},
-					{
-						"name": "pat_loc_id",
-						"type": "String"
-					},
-					{
-						"name": "pat_pcp_id",
-						"type": "String"
+						"type": "AzureBlobFSLocation",
+						"fileName": "Provider.json",
+						"folderPath": "Medallion/Bronze",
+						"fileSystem": "apollo-datasets"
 					}
-				]
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"Sheet1": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"prov_id": {
+										"type": "integer"
+									},
+									"prov_name": {
+										"type": "string"
+									},
+									"prov_loc_id": {
+										"type": "integer"
+									},
+									"prov_spec": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				}
 			},
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Apollo_G')]",
+			"name": "[concat(parameters('factoryName'), '/Provider_S')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -209,7 +163,8 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"folderPath": "Medallion/Gold",
+						"fileName": "Provider_Table_S.csv",
+						"folderPath": "Medallion/Silver",
 						"fileSystem": "apollo-datasets"
 					},
 					"columnDelimiter": ",",
@@ -217,9 +172,128 @@
 					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
-				"schema": []
+				"schema": [
+					{
+						"name": "dx_enc_id",
+						"type": "String"
+					},
+					{
+						"name": "dx_line",
+						"type": "String"
+					},
+					{
+						"name": "dx_icd",
+						"type": "String"
+					}
+				]
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RawDataFiles')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Blob2Adf_ls",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "apollo-data"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "dx_enc_id",
+						"type": "String"
+					},
+					{
+						"name": "dx_line",
+						"type": "String"
+					},
+					{
+						"name": "dx_icd",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MySQL2Azure_PL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "OnPrem2Azure",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".csv"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Patient_Raw",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Patient_R",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Patient_Raw')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Raw2Bronze_PL')]",
@@ -294,538 +368,8 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Encounter_DF')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "EncounterData_B",
-								"type": "DatasetReference"
-							},
-							"name": "EncounterData"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "EncounterData_S",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "TypeCorrection"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          enc_id as integer,",
-						"          enc_patient_id as integer,",
-						"          visit_prov_id as short,",
-						"          enc_status as string,",
-						"          enc_date as date,",
-						"          due_date as date",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> EncounterData",
-						"EncounterData derive(enc_status = replace(enc_status, \"Compeleted\", \"Completed\")) ~> TypeCorrection",
-						"TypeCorrection sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     filePattern:'Encounter_Table_S.csv',",
-						"     umask: 0022,",
-						"     preCommands: [],",
-						"     postCommands: [],",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     partitionBy('hash', 1)) ~> sink1"
-					]
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Encounter_Dx_DF')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "Encounter_Dx_B",
-								"type": "DatasetReference"
-							},
-							"name": "EncounterDxData"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "Encounter_Dx_S",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [],
-					"scriptLines": [
-						"source(output(",
-						"          dx_enc_id as string,",
-						"          dx_line as string,",
-						"          dx_icd as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> EncounterDxData",
-						"EncounterDxData sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          enc_id as string,",
-						"          enc_patient_id as string,",
-						"          visit_prov_id as string,",
-						"          enc_status as string,",
-						"          enc_date as string,",
-						"          due_date as string",
-						"     ),",
-						"     filePattern:'Encounter_Dx_Table_S.csv',",
-						"     umask: 0022,",
-						"     preCommands: [],",
-						"     postCommands: [],",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     partitionBy('hash', 1)) ~> sink1"
-					]
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Provider_DF')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "Provider_B",
-								"type": "DatasetReference"
-							},
-							"name": "ProviderData"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "Provider_S",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "flatten1"
-						},
-						{
-							"name": "Json2TableFormat"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          Sheet1 as (prov_id as short, prov_loc_id as short, prov_name as string, prov_spec as string)[]",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false,",
-						"     documentForm: 'arrayOfDocuments') ~> ProviderData",
-						"ProviderData foldDown(unroll(Sheet1),",
-						"     mapColumn(",
-						"          Sheet1",
-						"     ),",
-						"     skipDuplicateMapInputs: false,",
-						"     skipDuplicateMapOutputs: false) ~> flatten1",
-						"flatten1 select(mapColumn(",
-						"          prov_id = Sheet1.prov_id,",
-						"          prov_loc_id = Sheet1.prov_loc_id,",
-						"          prov_name = Sheet1.prov_name,",
-						"          prov_spec = Sheet1.prov_spec",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> Json2TableFormat",
-						"Json2TableFormat sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          dx_enc_id as string,",
-						"          dx_line as string,",
-						"          dx_icd as string",
-						"     ),",
-						"     filePattern:'Provider_Table_S.csv',",
-						"     umask: 0022,",
-						"     preCommands: [],",
-						"     postCommands: [],",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     partitionBy('hash', 1)) ~> sink1"
-					]
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PCP_DF')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "PCP_B",
-								"type": "DatasetReference"
-							},
-							"name": "PcpData"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "PCP_S",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [],
-					"scriptLines": [
-						"source(output(",
-						"          unique_patient_id as string,",
-						"          pcp_prov_id as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> PcpData",
-						"PcpData sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          dx_enc_id as string,",
-						"          dx_line as string,",
-						"          dx_icd as string",
-						"     ),",
-						"     filePattern:'PCP_Table_S.csv',",
-						"     umask: 0022,",
-						"     preCommands: [],",
-						"     postCommands: [],",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     partitionBy('hash', 1)) ~> sink1"
-					]
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Pregnancy_DF')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "PregnancyDiagnosis_B",
-								"type": "DatasetReference"
-							},
-							"name": "PregnancyDiagnosisData"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "PregnancyDiagnosis_S",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "AddUniqueKey"
-						},
-						{
-							"name": "select1"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          code as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> PregnancyDiagnosisData",
-						"PregnancyDiagnosisData keyGenerate(output(icd_id as long),",
-						"     startAt: 1L,",
-						"     stepValue: 1L) ~> AddUniqueKey",
-						"AddUniqueKey select(mapColumn(",
-						"          icd_id,",
-						"          code",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select1",
-						"select1 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          dx_enc_id as string,",
-						"          dx_line as string,",
-						"          dx_icd as string",
-						"     ),",
-						"     filePattern:'PregnancyDiagnosis_Table_S.csv',",
-						"     umask: 0022,",
-						"     preCommands: [],",
-						"     postCommands: [],",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     partitionBy('hash', 1)) ~> sink1"
-					]
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Location_DF')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "Location_B",
-								"type": "DatasetReference"
-							},
-							"name": "LocationData"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "Location_S",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "RemoveDuplicates"
-						},
-						{
-							"name": "selectedColumns"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          loc_id as string,",
-						"          loc_name as string,",
-						"          loc_sa as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> LocationData",
-						"LocationData aggregate(groupBy(loc_id,",
-						"          loc_name,",
-						"          loc_sa),",
-						"     ioc_id_new = count(loc_id)) ~> RemoveDuplicates",
-						"RemoveDuplicates select(mapColumn(",
-						"          loc_id,",
-						"          loc_name,",
-						"          loc_sa",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> selectedColumns",
-						"selectedColumns sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          dx_enc_id as string,",
-						"          dx_line as string,",
-						"          dx_icd as string",
-						"     ),",
-						"     filePattern:'Location_Table_S.csv',",
-						"     umask: 0022,",
-						"     preCommands: [],",
-						"     postCommands: [],",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     partitionBy('hash', 1)) ~> sink1"
-					]
-				}
-			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Location_S')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/MySQL2Azure_PL')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "OnPrem2Azure",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "MySqlSource"
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobStorageWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".csv"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "Patient_Raw",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "Patient_R",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Patient_Raw')]",
-				"[concat(variables('factoryId'), '/datasets/Patient_R')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Patient_DF')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "Patient_Blob2Bronze",
-								"type": "DatasetReference"
-							},
-							"name": "PatientData"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "Patient_Data_S",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "GenderFullForm"
-						},
-						{
-							"name": "CalculatingAge"
-						},
-						{
-							"name": "SelectingReqCol"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          unique_patient_id as string,",
-						"          gender as string,",
-						"          birth_date as date,",
-						"          pat_loc_id as string,",
-						"          pat_pcp_id as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> PatientData",
-						"PatientData derive(gender = iif(gender==\"M\", \"Male\", \"Female\")) ~> GenderFullForm",
-						"GenderFullForm derive(age = toInteger(minus(currentDate(), birth_date)/365)) ~> CalculatingAge",
-						"CalculatingAge select(mapColumn(",
-						"          unique_patient_id,",
-						"          gender,",
-						"          pat_loc_id,",
-						"          pat_pcp_id,",
-						"          age",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> SelectingReqCol",
-						"SelectingReqCol sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          dx_enc_id as string,",
-						"          dx_line as string,",
-						"          dx_icd as string",
-						"     ),",
-						"     filePattern:'Patient_Data_S.csv',",
-						"     umask: 0022,",
-						"     preCommands: [],",
-						"     postCommands: [],",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     partitionBy('hash', 1)) ~> sink1"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Patient_Blob2Bronze')]",
-				"[concat(variables('factoryId'), '/datasets/Patient_Data_S')]"
+				"[concat(variables('factoryId'), '/datasets/RawDataFiles')]"
 			]
 		},
 		{
@@ -1108,9 +652,472 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Location_S')]",
-				"[concat(variables('factoryId'), '/datasets/Patient_Data_S')]",
-				"[concat(variables('factoryId'), '/datasets/Apollo_G')]"
+				"[concat(variables('factoryId'), '/datasets/Provider_S')]",
+				"[concat(variables('factoryId'), '/datasets/PregnancyDiagnosis_S')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Encounter_DF')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "EncounterData_B",
+								"type": "DatasetReference"
+							},
+							"name": "EncounterData"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "EncounterData_S",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "TypeCorrection"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          enc_id as integer,",
+						"          enc_patient_id as integer,",
+						"          visit_prov_id as short,",
+						"          enc_status as string,",
+						"          enc_date as date,",
+						"          due_date as date",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> EncounterData",
+						"EncounterData derive(enc_status = replace(enc_status, \"Compeleted\", \"Completed\")) ~> TypeCorrection",
+						"TypeCorrection sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     filePattern:'Encounter_Table_S.csv',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Encounter_Dx_DF')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "Encounter_Dx_B",
+								"type": "DatasetReference"
+							},
+							"name": "EncounterDxData"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Encounter_Dx_S",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [],
+					"scriptLines": [
+						"source(output(",
+						"          dx_enc_id as string,",
+						"          dx_line as string,",
+						"          dx_icd as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> EncounterDxData",
+						"EncounterDxData sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          enc_id as string,",
+						"          enc_patient_id as string,",
+						"          visit_prov_id as string,",
+						"          enc_status as string,",
+						"          enc_date as string,",
+						"          due_date as string",
+						"     ),",
+						"     filePattern:'Encounter_Dx_Table_S.csv',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Location_DF')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "Location_B",
+								"type": "DatasetReference"
+							},
+							"name": "LocationData"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Location_S",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "RemoveDuplicates"
+						},
+						{
+							"name": "selectedColumns"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          loc_id as string,",
+						"          loc_name as string,",
+						"          loc_sa as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> LocationData",
+						"LocationData aggregate(groupBy(loc_id,",
+						"          loc_name,",
+						"          loc_sa),",
+						"     ioc_id_new = count(loc_id)) ~> RemoveDuplicates",
+						"RemoveDuplicates select(mapColumn(",
+						"          loc_id,",
+						"          loc_name,",
+						"          loc_sa",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectedColumns",
+						"selectedColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          dx_enc_id as string,",
+						"          dx_line as string,",
+						"          dx_icd as string",
+						"     ),",
+						"     filePattern:'Location_Table_S.csv',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PCP_DF')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "PCP_B",
+								"type": "DatasetReference"
+							},
+							"name": "PcpData"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "PCP_S",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [],
+					"scriptLines": [
+						"source(output(",
+						"          unique_patient_id as string,",
+						"          pcp_prov_id as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> PcpData",
+						"PcpData sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          dx_enc_id as string,",
+						"          dx_line as string,",
+						"          dx_icd as string",
+						"     ),",
+						"     filePattern:'PCP_Table_S.csv',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Patient_DF')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "Patient_Blob2Bronze",
+								"type": "DatasetReference"
+							},
+							"name": "PatientData"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Patient_Data_S",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "GenderFullForm"
+						},
+						{
+							"name": "CalculatingAge"
+						},
+						{
+							"name": "SelectingReqCol"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          unique_patient_id as string,",
+						"          gender as string,",
+						"          birth_date as date,",
+						"          pat_loc_id as string,",
+						"          pat_pcp_id as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> PatientData",
+						"PatientData derive(gender = iif(gender==\"M\", \"Male\", \"Female\")) ~> GenderFullForm",
+						"GenderFullForm derive(age = toInteger(minus(currentDate(), birth_date)/365)) ~> CalculatingAge",
+						"CalculatingAge select(mapColumn(",
+						"          unique_patient_id,",
+						"          gender,",
+						"          pat_loc_id,",
+						"          pat_pcp_id,",
+						"          age",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectingReqCol",
+						"SelectingReqCol sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          dx_enc_id as string,",
+						"          dx_line as string,",
+						"          dx_icd as string",
+						"     ),",
+						"     filePattern:'Patient_Data_S.csv',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Pregnancy_DF')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "PregnancyDiagnosis_B",
+								"type": "DatasetReference"
+							},
+							"name": "PregnancyDiagnosisData"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "PregnancyDiagnosis_S",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "AddUniqueKey"
+						},
+						{
+							"name": "select1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          code as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> PregnancyDiagnosisData",
+						"PregnancyDiagnosisData keyGenerate(output(icd_id as long),",
+						"     startAt: 1L,",
+						"     stepValue: 1L) ~> AddUniqueKey",
+						"AddUniqueKey select(mapColumn(",
+						"          icd_id,",
+						"          code",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          dx_enc_id as string,",
+						"          dx_line as string,",
+						"          dx_icd as string",
+						"     ),",
+						"     filePattern:'PregnancyDiagnosis_Table_S.csv',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/PregnancyDiagnosis_B')]",
+				"[concat(variables('factoryId'), '/datasets/PregnancyDiagnosis_S')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Provider_DF')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "Provider_B",
+								"type": "DatasetReference"
+							},
+							"name": "ProviderData"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Provider_S",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "flatten1"
+						},
+						{
+							"name": "Json2TableFormat"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Sheet1 as (prov_id as short, prov_loc_id as short, prov_name as string, prov_spec as string)[]",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     documentForm: 'arrayOfDocuments') ~> ProviderData",
+						"ProviderData foldDown(unroll(Sheet1),",
+						"     mapColumn(",
+						"          Sheet1",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flatten1",
+						"flatten1 select(mapColumn(",
+						"          prov_id = Sheet1.prov_id,",
+						"          prov_loc_id = Sheet1.prov_loc_id,",
+						"          prov_name = Sheet1.prov_name,",
+						"          prov_spec = Sheet1.prov_spec",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> Json2TableFormat",
+						"Json2TableFormat sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          dx_enc_id as string,",
+						"          dx_line as string,",
+						"          dx_icd as string",
+						"     ),",
+						"     filePattern:'Provider_Table_S.csv',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Provider_B')]",
+				"[concat(variables('factoryId'), '/datasets/Provider_S')]"
 			]
 		},
 		{
@@ -1419,7 +1426,14 @@
 					{
 						"name": "R2B",
 						"type": "ExecutePipeline",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "MySql2Azure",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"secureInput": false
 						},
@@ -1456,6 +1470,47 @@
 							"waitOnCompletion": true,
 							"parameters": {}
 						}
+					},
+					{
+						"name": "S2G",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "B2S",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Silver2Gold_PL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "MySql2Azure",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "MySQL2Azure_PL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
 					}
 				],
 				"policy": {
@@ -1465,7 +1520,9 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/Raw2Bronze_PL')]",
-				"[concat(variables('factoryId'), '/pipelines/Bronze2Silver_PL')]"
+				"[concat(variables('factoryId'), '/pipelines/Bronze2Silver_PL')]",
+				"[concat(variables('factoryId'), '/pipelines/Silver2Gold_PL')]",
+				"[concat(variables('factoryId'), '/pipelines/MySQL2Azure_PL')]"
 			]
 		}
 	]

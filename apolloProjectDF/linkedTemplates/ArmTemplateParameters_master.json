@@ -8,6 +8,15 @@
 		"Adf2AzSql_ls_password": {
 			"value": ""
 		},
+		"Adf2AzSql_ls_properties_typeProperties_server": {
+			"value": "apolloproject.database.windows.net"
+		},
+		"Adf2AzSql_ls_properties_typeProperties_database": {
+			"value": "apollo_db"
+		},
+		"Adf2AzSql_ls_properties_typeProperties_userName": {
+			"value": "apollo_admin"
+		},
 		"Adls2Adf_ls_properties_typeProperties_url": {
 			"value": "https://apolloadlsdata.dfs.core.windows.net/"
 		},
@@ -25,15 +34,6 @@
 		},
 		"MySql2Adf_ls_properties_typeProperties_username": {
 			"value": "root"
-		},
-		"Adf2AzSql_ls_properties_typeProperties_server": {
-			"value": "apolloproject.database.windows.net"
-		},
-		"Adf2AzSql_ls_properties_typeProperties_database": {
-			"value": "apollo_db"
-		},
-		"Adf2AzSql_ls_properties_typeProperties_userName": {
-			"value": "apollo_admin"
 		},
 		"containerUri": {
 			"value": ""
