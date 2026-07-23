@@ -5,17 +5,14 @@
 		"factoryName": {
 			"value": "apolloProjectDF"
 		},
-		"Adls2Adf_ls_accountKey": {
-			"value": ""
-		},
-		"Blob2Adf_ls_connectionString": {
-			"value": ""
-		},
 		"Adls2Adf_ls_properties_typeProperties_url": {
 			"value": "https://apolloadlsdata.dfs.core.windows.net/"
 		},
 		"AzureKeyVault_properties_typeProperties_baseUrl": {
 			"value": "https://ApolloKeyVaultStore.vault.azure.net/"
+		},
+		"Blob2Adf_ls_properties_typeProperties_connectionString_secretName": {
+			"value": "BlobConnStr"
 		}
 	}
 }
