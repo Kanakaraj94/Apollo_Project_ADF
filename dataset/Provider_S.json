@@ -10,6 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"fileName": "Provider_Table_S.csv",
 				"folderPath": "Medallion/Silver",
 				"fileSystem": "apollo-datasets"
 			},
