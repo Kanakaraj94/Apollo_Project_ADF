@@ -1,0 +1,35 @@
+{
+	"name": "Patient_R",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Blob2Adf_ls",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "apollo-data"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "dx_enc_id",
+				"type": "String"
+			},
+			{
+				"name": "dx_line",
+				"type": "String"
+			},
+			{
+				"name": "dx_icd",
+				"type": "String"
+			}
+		]
+	}
+}
