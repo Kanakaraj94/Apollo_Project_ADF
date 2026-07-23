@@ -237,6 +237,8 @@
 					{
 						"name": "Encounter_DataFlow",
 						"type": "ExecuteDataFlow",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -263,6 +265,36 @@
 							},
 							"traceLevel": "Fine"
 						}
+					},
+					{
+						"name": "EncounterDx_DF",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Encounter_Dx_DF",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"EncounterDxData": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
 					}
 				],
 				"policy": {
@@ -271,7 +303,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/Encounter_DF')]"
+				"[concat(variables('factoryId'), '/dataflows/Encounter_DF')]",
+				"[concat(variables('factoryId'), '/dataflows/Encounter_Dx_DF')]"
 			]
 		},
 		{
