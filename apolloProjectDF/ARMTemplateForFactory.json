@@ -1547,7 +1547,6 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"fileName": "`patient_table`.txt",
 						"container": "apollo-data"
 					},
 					"columnDelimiter": ",",
