@@ -1,0 +1,50 @@
+{
+	"name": "PCP_PL",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "PCP_B",
+						"type": "DatasetReference"
+					},
+					"name": "PcpData"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "PCP_S",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          unique_patient_id as string,",
+				"          pcp_prov_id as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> PcpData",
+				"PcpData sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          dx_enc_id as string,",
+				"          dx_line as string,",
+				"          dx_icd as string",
+				"     ),",
+				"     filePattern:'PCP_Table_S.csv',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}
