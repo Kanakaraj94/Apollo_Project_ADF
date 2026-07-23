@@ -1,0 +1,53 @@
+{
+	"name": "Encounter_DF",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "EncounterData_B",
+						"type": "DatasetReference"
+					},
+					"name": "EncounterData"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "EncounterData_S",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "TypeCorrection"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          enc_id as integer,",
+				"          enc_patient_id as integer,",
+				"          visit_prov_id as short,",
+				"          enc_status as string,",
+				"          enc_date as date,",
+				"          due_date as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> EncounterData",
+				"EncounterData derive(enc_status = replace(enc_status, \"Compeleted\", \"Completed\")) ~> TypeCorrection",
+				"TypeCorrection sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     filePattern:'Encounter_Table_S.csv',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

@@ -1,0 +1,41 @@
+{
+	"name": "EncounterData_B",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Adls2Adf_ls",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "Encounter_Table",
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Encounter_Table.xlsx",
+				"folderPath": "Medallion/Bronze",
+				"fileSystem": "apollo-datasets"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": [
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			}
+		]
+	}
+}
