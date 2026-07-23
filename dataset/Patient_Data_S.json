@@ -1,17 +1,17 @@
 {
-	"name": "Patient_R",
+	"name": "Patient_Data_S",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "Blob2Adf_ls",
+			"referenceName": "Adls2Adf_ls",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobStorageLocation",
-				"fileName": "`patient_table`.txt",
-				"container": "apollo-data"
+				"type": "AzureBlobFSLocation",
+				"folderPath": "Medallion/Silver",
+				"fileSystem": "apollo-datasets"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",

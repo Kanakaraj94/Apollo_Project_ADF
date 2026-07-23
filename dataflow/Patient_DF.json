@@ -1,0 +1,74 @@
+{
+	"name": "Patient_DF",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Patient_R",
+						"type": "DatasetReference"
+					},
+					"name": "PatientData"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Patient_Data_S",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "GenderFullForm"
+				},
+				{
+					"name": "CalculatingAge"
+				},
+				{
+					"name": "SelectingReqCol"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          unique_patient_id as short,",
+				"          gender as string,",
+				"          birth_date as date,",
+				"          pat_loc_id as short,",
+				"          pat_pcp_id as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> PatientData",
+				"PatientData derive(gender = iif(gender==\"M\", \"Male\", \"Female\")) ~> GenderFullForm",
+				"GenderFullForm derive(age = toInteger(minus(currentDate(), birth_date)/365)) ~> CalculatingAge",
+				"CalculatingAge select(mapColumn(",
+				"          unique_patient_id,",
+				"          gender,",
+				"          pat_loc_id,",
+				"          pat_pcp_id,",
+				"          age",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectingReqCol",
+				"SelectingReqCol sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          dx_enc_id as string,",
+				"          dx_line as string,",
+				"          dx_icd as string",
+				"     ),",
+				"     filePattern:'Patient_Data_S.csv',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}
