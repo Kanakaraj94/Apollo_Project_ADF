@@ -13,6 +13,133 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/Provider_DF')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "Provider_B",
+								"type": "DatasetReference"
+							},
+							"name": "ProviderData"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Provider_S",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "flatten1"
+						},
+						{
+							"name": "Json2TableFormat"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Sheet1 as (prov_id as short, prov_loc_id as short, prov_name as string, prov_spec as string)[]",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     documentForm: 'arrayOfDocuments') ~> ProviderData",
+						"ProviderData foldDown(unroll(Sheet1),",
+						"     mapColumn(",
+						"          Sheet1",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flatten1",
+						"flatten1 select(mapColumn(",
+						"          prov_id = Sheet1.prov_id,",
+						"          prov_loc_id = Sheet1.prov_loc_id,",
+						"          prov_name = Sheet1.prov_name,",
+						"          prov_spec = Sheet1.prov_spec",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> Json2TableFormat",
+						"Json2TableFormat sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          dx_enc_id as string,",
+						"          dx_line as string,",
+						"          dx_icd as string",
+						"     ),",
+						"     filePattern:'Provider_Table_S.csv',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PCP_PL')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "PCP_B",
+								"type": "DatasetReference"
+							},
+							"name": "PcpData"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "PCP_S",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [],
+					"scriptLines": [
+						"source(output(",
+						"          unique_patient_id as string,",
+						"          pcp_prov_id as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> PcpData",
+						"PcpData sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          dx_enc_id as string,",
+						"          dx_line as string,",
+						"          dx_icd as string",
+						"     ),",
+						"     filePattern:'PCP_Table_S.csv',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Pregnancy_DF')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -69,6 +196,78 @@
 						"          dx_icd as string",
 						"     ),",
 						"     filePattern:'PregnancyDiagnosis_Table_S.csv',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Location_DF')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "Location_B",
+								"type": "DatasetReference"
+							},
+							"name": "LocationData"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Location_S",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "RemoveDuplicates"
+						},
+						{
+							"name": "selectedColumns"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          loc_id as string,",
+						"          loc_name as string,",
+						"          loc_sa as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> LocationData",
+						"LocationData aggregate(groupBy(loc_id,",
+						"          loc_name,",
+						"          loc_sa),",
+						"     ioc_id_new = count(loc_id)) ~> RemoveDuplicates",
+						"RemoveDuplicates select(mapColumn(",
+						"          loc_id,",
+						"          loc_name,",
+						"          loc_sa",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectedColumns",
+						"selectedColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          dx_enc_id as string,",
+						"          dx_line as string,",
+						"          dx_icd as string",
+						"     ),",
+						"     filePattern:'Location_Table_S.csv',",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
@@ -186,7 +385,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/Provider_DF')]"
+			]
 		}
 	]
 }

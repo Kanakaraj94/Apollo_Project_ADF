@@ -1076,6 +1076,164 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/Adls2Adf_ls')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Location_DF')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "Location_B",
+								"type": "DatasetReference"
+							},
+							"name": "LocationData"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Location_S",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "RemoveDuplicates"
+						},
+						{
+							"name": "selectedColumns"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          loc_id as string,",
+						"          loc_name as string,",
+						"          loc_sa as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> LocationData",
+						"LocationData aggregate(groupBy(loc_id,",
+						"          loc_name,",
+						"          loc_sa),",
+						"     ioc_id_new = count(loc_id)) ~> RemoveDuplicates",
+						"RemoveDuplicates select(mapColumn(",
+						"          loc_id,",
+						"          loc_name,",
+						"          loc_sa",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selectedColumns",
+						"selectedColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          dx_enc_id as string,",
+						"          dx_line as string,",
+						"          dx_icd as string",
+						"     ),",
+						"     filePattern:'Location_Table_S.csv',",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     partitionBy('hash', 1)) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Location_B')]",
+				"[concat(variables('factoryId'), '/datasets/Location_S')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Location_B')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Adls2Adf_ls",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Location_Table.csv",
+						"folderPath": "Medallion/Bronze",
+						"fileSystem": "apollo-datasets"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "loc_id",
+						"type": "String"
+					},
+					{
+						"name": "loc_name",
+						"type": "String"
+					},
+					{
+						"name": "loc_sa",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Adls2Adf_ls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Location_S')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Adls2Adf_ls",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "Medallion/Silver",
+						"fileSystem": "apollo-datasets"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "dx_enc_id",
+						"type": "String"
+					},
+					{
+						"name": "dx_line",
+						"type": "String"
+					},
+					{
+						"name": "dx_icd",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Adls2Adf_ls')]"
+			]
 		}
 	]
 }
