@@ -1,0 +1,37 @@
+{
+	"name": "Encounter_Dx_B",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Adls2Adf_ls",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Encounter_dx_Table.csv",
+				"folderPath": "Medallion/Bronze",
+				"fileSystem": "apollo-datasets"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "dx_enc_id",
+				"type": "String"
+			},
+			{
+				"name": "dx_line",
+				"type": "String"
+			},
+			{
+				"name": "dx_icd",
+				"type": "String"
+			}
+		]
+	}
+}
