@@ -14,6 +14,15 @@
 		"Blob2Adf_ls_properties_typeProperties_connectionString_secretName": {
 			"value": "BlobConnStr"
 		},
+		"MySql2Adf_ls_properties_typeProperties_server": {
+			"value": "localhost"
+		},
+		"MySql2Adf_ls_properties_typeProperties_database": {
+			"value": "apollo_db"
+		},
+		"MySql2Adf_ls_properties_typeProperties_username": {
+			"value": "root"
+		},
 		"containerUri": {
 			"value": ""
 		},

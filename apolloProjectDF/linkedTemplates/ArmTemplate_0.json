@@ -18,6 +18,18 @@
 		"Blob2Adf_ls_properties_typeProperties_connectionString_secretName": {
 			"type": "string",
 			"defaultValue": "BlobConnStr"
+		},
+		"MySql2Adf_ls_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "localhost"
+		},
+		"MySql2Adf_ls_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "apollo_db"
+		},
+		"MySql2Adf_ls_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "root"
 		}
 	},
 	"variables": {
@@ -89,6 +101,40 @@
 				}
 			},
 			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MySql2Adf_ls')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "MySql",
+				"typeProperties": {
+					"server": "[parameters('MySql2Adf_ls_properties_typeProperties_server')]",
+					"port": 3306,
+					"database": "[parameters('MySql2Adf_ls_properties_typeProperties_database')]",
+					"username": "[parameters('MySql2Adf_ls_properties_typeProperties_username')]",
+					"sslMode": 1,
+					"useSystemTrustStore": 0,
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "MySqlPassword"
+					},
+					"driverVersion": "v2"
+				},
+				"connectVia": {
+					"referenceName": "SelfHostedIR",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/SelfHostedIR')]",
 				"[concat(variables('factoryId'), '/linkedServices/AzureKeyVault')]"
 			]
 		},
@@ -657,141 +703,23 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Raw2Bronze_PL')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
+			"name": "[concat(parameters('factoryName'), '/Patient_Raw')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"activities": [
-					{
-						"name": "Copy data R2B",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"wildcardFileName": "*",
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
-								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".txt"
-								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "RawDataFiles",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "BronzeDataFiles",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
+				"linkedServiceName": {
+					"referenceName": "MySql2Adf_ls",
+					"type": "LinkedServiceReference"
 				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/RawDataFiles')]",
-				"[concat(variables('factoryId'), '/datasets/BronzeDataFiles')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Encounter_DF')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
+				"annotations": [],
+				"type": "MySqlTable",
+				"schema": [],
 				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "EncounterData_B",
-								"type": "DatasetReference"
-							},
-							"name": "EncounterData"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "EncounterData_S",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "TypeCorrection"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          enc_id as integer,",
-						"          enc_patient_id as integer,",
-						"          visit_prov_id as short,",
-						"          enc_status as string,",
-						"          enc_date as date,",
-						"          due_date as date",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> EncounterData",
-						"EncounterData derive(enc_status = replace(enc_status, \"Compeleted\", \"Completed\")) ~> TypeCorrection",
-						"TypeCorrection sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     filePattern:'Encounter_Table_S.csv',",
-						"     umask: 0022,",
-						"     preCommands: [],",
-						"     postCommands: [],",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     partitionBy('hash', 1)) ~> sink1"
-					]
+					"tableName": "`patient_table`"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/EncounterData_B')]",
-				"[concat(variables('factoryId'), '/datasets/EncounterData_S')]"
+				"[concat(variables('factoryId'), '/linkedServices/MySql2Adf_ls')]"
 			]
 		}
 	]
