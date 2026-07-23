@@ -1,0 +1,44 @@
+{
+	"name": "Provider_B",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Adls2Adf_ls",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Provider.json",
+				"folderPath": "Medallion/Bronze",
+				"fileSystem": "apollo-datasets"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"Sheet1": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"prov_id": {
+								"type": "integer"
+							},
+							"prov_name": {
+								"type": "string"
+							},
+							"prov_loc_id": {
+								"type": "integer"
+							},
+							"prov_spec": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
