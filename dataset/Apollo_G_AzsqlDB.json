@@ -1,0 +1,16 @@
+{
+	"name": "Apollo_G_AzsqlDB",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Adf2AzSql_ls",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "",
+			"table": "Apollo_Tb"
+		}
+	}
+}

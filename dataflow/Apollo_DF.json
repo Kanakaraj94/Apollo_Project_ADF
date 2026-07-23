@@ -5,44 +5,273 @@
 		"typeProperties": {
 			"sources": [
 				{
-					"name": "source1"
+					"dataset": {
+						"referenceName": "EncounterData_S",
+						"type": "DatasetReference"
+					},
+					"name": "Encounter"
 				},
 				{
-					"name": "source2"
+					"dataset": {
+						"referenceName": "Encounter_Dx_S",
+						"type": "DatasetReference"
+					},
+					"name": "EncounterDx"
 				},
 				{
-					"name": "source3"
+					"dataset": {
+						"referenceName": "Location_S",
+						"type": "DatasetReference"
+					},
+					"name": "Location"
 				},
 				{
-					"name": "source4"
+					"dataset": {
+						"referenceName": "Provider_S",
+						"type": "DatasetReference"
+					},
+					"name": "Provider"
 				},
 				{
-					"name": "source5"
+					"dataset": {
+						"referenceName": "PCP_S",
+						"type": "DatasetReference"
+					},
+					"name": "PCP"
 				},
 				{
-					"name": "source6"
+					"dataset": {
+						"referenceName": "PregnancyDiagnosis_S",
+						"type": "DatasetReference"
+					},
+					"name": "PregnancyDiagnosis"
 				},
 				{
-					"name": "source7"
+					"dataset": {
+						"referenceName": "Patient_Data_S",
+						"type": "DatasetReference"
+					},
+					"name": "PatientData"
 				}
 			],
-			"sinks": [],
-			"transformations": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Apollo_G",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "Apollo_G_AzsqlDB",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "PatientLocationData"
+				},
+				{
+					"name": "ReqColumns"
+				},
+				{
+					"name": "PatientLocPCP"
+				},
+				{
+					"name": "SelectReqColumns"
+				},
+				{
+					"name": "PatLocPcpProvData"
+				},
+				{
+					"name": "OnlyReqColumns"
+				},
+				{
+					"name": "EncounterEncounterDx"
+				},
+				{
+					"name": "selectedColumns"
+				},
+				{
+					"name": "EncEncDxPatLocPcpProvData"
+				},
+				{
+					"name": "FinalSelectedColumns"
+				}
+			],
 			"scriptLines": [
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source1",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source2",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source3",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source4",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source5",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source6",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source7"
+				"source(output(",
+				"          enc_id as integer,",
+				"          enc_patient_id as integer,",
+				"          visit_prov_id as short,",
+				"          enc_status as string,",
+				"          enc_date as date,",
+				"          due_date as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Encounter",
+				"source(output(",
+				"          dx_enc_id as short,",
+				"          dx_line as short,",
+				"          dx_icd as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> EncounterDx",
+				"source(output(",
+				"          loc_id as short,",
+				"          loc_name as string,",
+				"          loc_sa as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Location",
+				"source(output(",
+				"          prov_id as short,",
+				"          prov_loc_id as short,",
+				"          prov_name as string,",
+				"          prov_spec as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Provider",
+				"source(output(",
+				"          unique_patient_id as short,",
+				"          pcp_prov_id as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> PCP",
+				"source(output(",
+				"          icd_id as short,",
+				"          code as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> PregnancyDiagnosis",
+				"source(output(",
+				"          unique_patient_id as short,",
+				"          gender as string,",
+				"          pat_loc_id as short,",
+				"          pat_pcp_id as short,",
+				"          age as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> PatientData",
+				"PatientData, Location join(pat_loc_id == loc_id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> PatientLocationData",
+				"PatientLocationData select(mapColumn(",
+				"          unique_patient_id,",
+				"          gender,",
+				"          pat_pcp_id,",
+				"          age,",
+				"          loc_name,",
+				"          loc_sa",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> ReqColumns",
+				"ReqColumns, PCP join(ReqColumns@unique_patient_id == PCP@unique_patient_id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> PatientLocPCP",
+				"PatientLocPCP select(mapColumn(",
+				"          unique_patient_id = ReqColumns@unique_patient_id,",
+				"          gender,",
+				"          pat_pcp_id,",
+				"          age,",
+				"          loc_name,",
+				"          loc_sa,",
+				"          primary_provider = pcp_prov_id",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectReqColumns",
+				"SelectReqColumns, Provider join(primary_provider == prov_id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> PatLocPcpProvData",
+				"PatLocPcpProvData select(mapColumn(",
+				"          unique_patient_id,",
+				"          gender,",
+				"          pat_pcp_id,",
+				"          age,",
+				"          loc_name,",
+				"          loc_sa,",
+				"          prov_loc_id,",
+				"          prov_name,",
+				"          prov_spec",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> OnlyReqColumns",
+				"Encounter, EncounterDx join(enc_id == dx_enc_id,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> EncounterEncounterDx",
+				"EncounterEncounterDx select(mapColumn(",
+				"          enc_id,",
+				"          enc_patient_id,",
+				"          visit_prov_id,",
+				"          enc_status,",
+				"          enc_date,",
+				"          due_date,",
+				"          dx_line,",
+				"          dx_icd",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectedColumns",
+				"selectedColumns, OnlyReqColumns join(enc_patient_id == unique_patient_id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> EncEncDxPatLocPcpProvData",
+				"EncEncDxPatLocPcpProvData select(mapColumn(",
+				"          unique_patient_id,",
+				"          enc_id,",
+				"          visit_prov_id,",
+				"          enc_status,",
+				"          enc_date,",
+				"          due_date,",
+				"          dx_line,",
+				"          dx_icd,",
+				"          gender,",
+				"          pat_pcp_id,",
+				"          age,",
+				"          loc_name,",
+				"          loc_sa,",
+				"          prov_name,",
+				"          prov_spec",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> FinalSelectedColumns",
+				"FinalSelectedColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     filePattern:'Apollo_G.csv',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1",
+				"FinalSelectedColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink2"
 			]
 		}
 	}
