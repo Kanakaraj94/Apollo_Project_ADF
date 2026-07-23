@@ -36,7 +36,7 @@
 				"source(output(",
 				"          unique_patient_id as string,",
 				"          gender as string,",
-				"          birth_date as string,",
+				"          birth_date as date,",
 				"          pat_loc_id as string,",
 				"          pat_pcp_id as string",
 				"     ),",
