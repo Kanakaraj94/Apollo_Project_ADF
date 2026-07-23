@@ -1,0 +1,69 @@
+{
+	"name": "Location_DF",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Location_B",
+						"type": "DatasetReference"
+					},
+					"name": "LocationData"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Location_S",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "RemoveDuplicates"
+				},
+				{
+					"name": "selectedColumns"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          loc_id as string,",
+				"          loc_name as string,",
+				"          loc_sa as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> LocationData",
+				"LocationData aggregate(groupBy(loc_id,",
+				"          loc_name,",
+				"          loc_sa),",
+				"     ioc_id_new = count(loc_id)) ~> RemoveDuplicates",
+				"RemoveDuplicates select(mapColumn(",
+				"          loc_id,",
+				"          loc_name,",
+				"          loc_sa",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectedColumns",
+				"selectedColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          dx_enc_id as string,",
+				"          dx_line as string,",
+				"          dx_icd as string",
+				"     ),",
+				"     filePattern:'Location_Table_S.csv',",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}
