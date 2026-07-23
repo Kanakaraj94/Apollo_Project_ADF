@@ -1,0 +1,44 @@
+{
+	"name": "Patient_Blob2Bronze",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Blob2Adf_ls",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "`patient_table`.csv",
+				"container": "apollo-data"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "unique_patient_id",
+				"type": "String"
+			},
+			{
+				"name": "gender",
+				"type": "String"
+			},
+			{
+				"name": "birth_date",
+				"type": "String"
+			},
+			{
+				"name": "pat_loc_id",
+				"type": "String"
+			},
+			{
+				"name": "pat_pcp_id",
+				"type": "String"
+			}
+		]
+	}
+}

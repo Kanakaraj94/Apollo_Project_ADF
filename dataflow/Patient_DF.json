@@ -6,7 +6,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "Patient_R",
+						"referenceName": "Patient_Blob2Bronze",
 						"type": "DatasetReference"
 					},
 					"name": "PatientData"
@@ -34,11 +34,11 @@
 			],
 			"scriptLines": [
 				"source(output(",
-				"          unique_patient_id as short,",
+				"          unique_patient_id as string,",
 				"          gender as string,",
-				"          birth_date as date,",
-				"          pat_loc_id as short,",
-				"          pat_pcp_id as short",
+				"          birth_date as string,",
+				"          pat_loc_id as string,",
+				"          pat_pcp_id as string",
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
