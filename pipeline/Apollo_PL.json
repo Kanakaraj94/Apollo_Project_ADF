@@ -1,0 +1,47 @@
+{
+	"name": "Apollo_PL",
+	"properties": {
+		"activities": [
+			{
+				"name": "R2B",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Raw2Bronze_PL",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "B2S",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "R2B",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Bronze2Silver_PL",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"annotations": []
+	}
+}
