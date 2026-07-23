@@ -90,6 +90,53 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Patient_Blob2Bronze')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Blob2Adf_ls",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "`patient_table`.csv",
+						"container": "apollo-data"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "unique_patient_id",
+						"type": "String"
+					},
+					{
+						"name": "gender",
+						"type": "String"
+					},
+					{
+						"name": "birth_date",
+						"type": "String"
+					},
+					{
+						"name": "pat_loc_id",
+						"type": "String"
+					},
+					{
+						"name": "pat_pcp_id",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Raw2Bronze_PL')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -623,7 +670,7 @@
 					"sources": [
 						{
 							"dataset": {
-								"referenceName": "Patient_R",
+								"referenceName": "Patient_Blob2Bronze",
 								"type": "DatasetReference"
 							},
 							"name": "PatientData"
@@ -651,11 +698,11 @@
 					],
 					"scriptLines": [
 						"source(output(",
-						"          unique_patient_id as short,",
+						"          unique_patient_id as string,",
 						"          gender as string,",
 						"          birth_date as date,",
-						"          pat_loc_id as short,",
-						"          pat_pcp_id as short",
+						"          pat_loc_id as string,",
+						"          pat_pcp_id as string",
 						"     ),",
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
@@ -689,7 +736,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Patient_R')]",
+				"[concat(variables('factoryId'), '/datasets/Patient_Blob2Bronze')]",
 				"[concat(variables('factoryId'), '/datasets/Patient_Data_S')]"
 			]
 		},
